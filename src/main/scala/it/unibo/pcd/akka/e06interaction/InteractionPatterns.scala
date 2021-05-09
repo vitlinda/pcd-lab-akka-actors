@@ -69,3 +69,22 @@ object InteractionPatternsSelfMessage extends App {
 
   system ! "hello akka"
 }
+
+object InteractionPatternsMsgAdapter extends App {
+  val system = ActorSystem[String](Behaviors.setup { ctx =>
+    val adaptedRef: ActorRef[Int] = ctx.messageAdapter[Int](i => if(i==0) "" else i.toString)
+    adaptedRef ! 130
+    adaptedRef ! 0
+    Behaviors.receiveMessage {
+      case "" =>
+        ctx.log.info("Bye bye")
+        Behaviors.stopped
+      case s =>
+        ctx.log.info(s)
+        Behaviors.same
+    }
+  }, name = "hello-world")
+
+  system ! "hello akka"
+}
+
