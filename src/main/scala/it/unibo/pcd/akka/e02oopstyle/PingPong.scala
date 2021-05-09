@@ -48,6 +48,7 @@ object PingPongMain extends App {
     val pingponger = ctx.spawn(Behaviors.setup[PingPong](ctx => new PingPonger(ctx, 5)), "ping-ponger")
     // Watching child
     ctx.watch(pingponger)
+    ctx.log.info(s"I am the root user guardian. My path is: ${ctx.self.path}")
     Behaviors.receiveMessage[PingPong](msg => {
       pingponger ! msg
       Behaviors.same
