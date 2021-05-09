@@ -14,8 +14,8 @@ object HelloBehavior {
   }
 }
 
-object HelloWorldAkkaType extends App {
-  val system: ActorSystem[HelloBehavior.Greet] = ActorSystem(guardianBehavior = HelloBehavior(), name = "hello-world-akka-system")
+object HelloWorldAkkaTyped extends App {
+  val system: ActorSystem[HelloBehavior.Greet] = ActorSystem(HelloBehavior(), name = "hello-world")
   system ! HelloBehavior.Greet("Akka Typed", system.ignoreRef)
   Thread.sleep(5000)
   system.terminate()
