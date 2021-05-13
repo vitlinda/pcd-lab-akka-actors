@@ -1,4 +1,4 @@
-package it.unibo.pcd.akka.e04actorlifecycle
+package it.unibo.pcd.akka.basics.e04actorlifecycle
 
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Props, Scheduler, SpawnProtocol}
 import akka.actor.typed.scaladsl.Behaviors

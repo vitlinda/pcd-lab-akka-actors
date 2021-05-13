@@ -1,4 +1,4 @@
-package it.unibo.pcd.akka.e03state
+package it.unibo.pcd.akka.basics.e03state
 
 import akka.actor.Status.Success
 import akka.actor.typed.scaladsl.AskPattern.Askable

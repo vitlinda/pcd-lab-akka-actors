@@ -1,10 +1,9 @@
-package it.unibo.pcd.akka
+package it.unibo.pcd.akka.basics
 
 import akka.actor.testkit.typed.Effect
-import akka.actor.testkit.typed.Effect.SpawnedAnonymous
 import akka.actor.testkit.typed.scaladsl.{BehaviorTestKit, TestInbox}
-import akka.actor.typed.{ActorRef, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.{ActorRef, Behavior}
 import org.scalatest.funsuite.AnyFunSuite
 
 object ActorUnderTest {

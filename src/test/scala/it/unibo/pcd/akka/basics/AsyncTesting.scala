@@ -1,12 +1,12 @@
-package it.unibo.pcd.akka
+package it.unibo.pcd.akka.basics
 
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
-import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.Behaviors
-import it.unibo.pcd.akka.e03state.GuessGame.PlayerMessage
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import it.unibo.pcd.akka.basics.e02oopstyle._
+import it.unibo.pcd.akka.basics.e03state.GuessGame._
 
 class AsyncTesting
   extends AnyWordSpec with Matchers with BeforeAndAfterAll {
@@ -17,7 +17,6 @@ class AsyncTesting
 
   "A testkit" must {
     "support verifying a response" in {
-      import e02oopstyle._
       val pinger = testKit.spawn[PingPong](Behaviors.setup(new PingPonger(_)), "ping")
       val probe = testKit.createTestProbe[PingPong]()
 
@@ -31,8 +30,6 @@ class AsyncTesting
     }
 
     "support mocking" in {
-      import e03state._
-      import GuessGame._
       val BAD_GUESS = -1
       val SECRET = 50
       val NUM_ATTEMPTS = 3

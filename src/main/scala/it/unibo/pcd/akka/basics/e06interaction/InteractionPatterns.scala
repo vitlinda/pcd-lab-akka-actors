@@ -1,4 +1,4 @@
-package it.unibo.pcd.akka.e06interaction
+package it.unibo.pcd.akka.basics.e06interaction
 
 import akka.actor.typed.scaladsl.AskPattern.Askable
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, Scheduler}

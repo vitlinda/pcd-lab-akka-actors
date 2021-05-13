@@ -1,4 +1,4 @@
-package it.unibo.pcd.akka.e04actorlifecycle
+package it.unibo.pcd.akka.basics.e04actorlifecycle
 
 import akka.actor.typed.{ActorSystem, Behavior, SupervisorStrategy, Terminated}
 import akka.actor.typed.scaladsl.Behaviors

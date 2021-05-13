@@ -1,4 +1,4 @@
-package it.unibo.pcd.akka.e05blockingissue
+package it.unibo.pcd.akka.basics.e05blockingissue
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior, DispatcherSelector, LogOptions}

@@ -1,4 +1,4 @@
-package it.unibo.pcd.akka.e01hello
+package it.unibo.pcd.akka.basics.e01hello
 
 import akka.actor.typed.{ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}

@@ -1,4 +1,4 @@
-package it.unibo.pcd.akka.e07fsm
+package it.unibo.pcd.akka.basics.e07fsm
 
 import akka.NotUsed
 import akka.actor.typed.ActorRef
@@ -6,13 +6,13 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.Behaviors
-import it.unibo.pcd.akka.e07fsm.Chopstick.Busy
-import it.unibo.pcd.akka.e07fsm.Chopstick.ChopstickAnswer
-import it.unibo.pcd.akka.e07fsm.Chopstick.ChopstickMessage
-import it.unibo.pcd.akka.e07fsm.Chopstick.Put
-import it.unibo.pcd.akka.e07fsm.Chopstick.Take
-import it.unibo.pcd.akka.e07fsm.Chopstick.Taken
-import it.unibo.pcd.akka.e07fsm.Hakker.Command
+import it.unibo.pcd.akka.basics.e07fsm.Chopstick.Busy
+import it.unibo.pcd.akka.basics.e07fsm.Chopstick.ChopstickAnswer
+import it.unibo.pcd.akka.basics.e07fsm.Chopstick.ChopstickMessage
+import it.unibo.pcd.akka.basics.e07fsm.Chopstick.Put
+import it.unibo.pcd.akka.basics.e07fsm.Chopstick.Take
+import it.unibo.pcd.akka.basics.e07fsm.Chopstick.Taken
+import it.unibo.pcd.akka.basics.e07fsm.Hakker.Command
 
 import scala.concurrent.duration._
 
