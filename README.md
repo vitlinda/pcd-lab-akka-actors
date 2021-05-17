@@ -23,9 +23,9 @@ This tutorial contains 3 samples illustrating different [Akka cluster](https://d
     - To enable cluster capabilities in your Akka project you should, at a minimum, add the remote settings, and use `cluster` as the `akka.actor.provider`. The `akka.cluster.seed-nodes` should normally also be added to your `application.conf` file.
     - The seed nodes are configured contact points which newly started nodes will try to connect with in order to join the cluster.
     - Note that if you are going to start the nodes on different machines you need to specify the ip-addresses or host names of the machines in `application.conf` instead of `127.0.0.1`.
-2. Open [SimpleClusterApp.scala](src/main/scala/sample/cluster/simple/App.scala).
+2. Open [SimpleClusterApp.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/simple/App.scala).
     - The small program together with its configuration starts an ActorSystem with the Cluster enabled. It joins the cluster and starts an actor that logs some membership events.
-    Take a look at the [SimpleClusterListener.scala](src/main/scala/sample/cluster/simple/ClusterListener.scala) actor.
+    Take a look at the [SimpleClusterListener.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/simple/ClusterListener.scala) actor.
     - You can read more about the cluster concepts in the [documentation](https://doc.akka.io/docs/akka/2.6/typed/cluster.html).
 3. To run this sample, type **`sbt "runMain it.unibo.pcd.akka.distributed.cluster.simple.App"`**.
     - `it.unibo.pcd.akka.distributed.cluster.simple.App` starts three actor systems (cluster members) in the same JVM process.
@@ -61,10 +61,10 @@ Let's take a look at an example that illustrates how workers, here only on nodes
 - At a periodic interval the frontend simulates an external request to process a text which it forwards to available workers if there are any.
 - Since the discovery of workers is dynamic both *backend*  and *frontend* nodes can be added to the cluster dynamically.
 - The backend worker that performs the transformation job is defined in
-  [TransformationBackend.scala](src/main/scala/sample/cluster/transformation/Worker.scala).
+  [Worker.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/transformation/Worker.scala).
   When starting up a worker registers itself to the receptionist so that it can be discovered through its `ServiceKey` on any node in the cluster.
 - The frontend that simulates user jobs as well as keeping track of available workers is defined in
- [Frontend.scala](src/main/scala/sample/cluster/transformation/Frontend.scala). The actor subscribes to the `Receptionist`
+ [Frontend.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/transformation/Frontend.scala). The actor subscribes to the `Receptionist`
  with the `WorkerServiceKey` to receive updates when the set of available workers in the cluster changes.
  If a worker dies or its node is removed from the cluster the receptionist will send out an updated listing
  so the frontend does not need to `watch` the workers.
@@ -109,13 +109,13 @@ The example application provides a service to calculate statistics for a text.
 and delegates the task to count number of characters in each word to a separate worker, a routee of a router.
 - The character count for each word is sent back to an aggregator that calculates the average number of characters per word when all results have been collected.
 - The **worker** that counts number of characters in each word
-  is defined in **[StatsWorker.scala](src/main/scala/sample/cluster/stats/StatsWorker.scala)**.
+  is defined in **[StatsWorker.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/stats/StatsWorker.scala)**.
 - The **service** that receives text from users and splits it up into words, delegates to a pool of workers and aggregates the result
-  is defined in **[StatsService.scala](src/main/scala/sample/cluster/stats/StatsService.scala)**.
+  is defined in **[StatsService.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/stats/StatsService.scala)**.
 - Note, nothing cluster specific so far, just plain actors.
 - Nodes in the cluster can be marked with roles, to perform different tasks, in our case we use **`compute`** as a role to
 designate cluster nodes that should do processing of word statistics.
-- In **[stats/App.scala](src/main/scala/sample/cluster/stats/App.scala)** each `compute` node starts a `StatsService`
+- In **[stats/App.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/stats/App.scala)** each `compute` node starts a `StatsService`
 that distributes work over N local `StatsWorkers`. The client nodes then message the `StatsService` instances through a `group` router.
 The router finds services by subscribing to the cluster receptionist and a service key. Each worker is registered to the receptionist
 when started.
@@ -138,7 +138,7 @@ To run the sample, type `sbt "runMain it.unibo.pcd.akka.distributed.cluster.stat
 
 #### Router example with Cluster Singleton
 
-In **[AppOneMaster.scala](src/main/scala/sample/cluster/stats/AppOneMaster.scala)**, each `compute` node starts
+In **[AppOneMaster.scala](src/main/scala/it/unibo/pcd/akka/distributed/cluster/stats/AppOneMaster.scala)**, each `compute` node starts
 N workers, that register themselves with the receptionist. The **`StatsService`** is run in a **single instance** in the cluster
 through the **[Akka Cluster Singleton](https://doc.akka.io/docs/akka/current/typed/cluster-singleton.html)**.
 The actual work is performed by workers on all compute nodes though. The workers
