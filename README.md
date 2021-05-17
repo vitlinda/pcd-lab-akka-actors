@@ -17,7 +17,7 @@ This tutorial contains 3 samples illustrating different [Akka cluster](https://d
 - Sending messages to actors running on nodes in the cluster
 - Cluster aware routers
 
-### 1. A Simple Cluster Example
+### 1. A Simple Cluster Example (listening to membership events)
 
 1. Open [application.conf](src/main/resources/application.conf)
     - To enable cluster capabilities in your Akka project you should, at a minimum, add the remote settings, and use `cluster` as the `akka.actor.provider`. The `akka.cluster.seed-nodes` should normally also be added to your `application.conf` file.
@@ -47,7 +47,7 @@ This tutorial contains 3 samples illustrating different [Akka cluster](https://d
    It gets notified a stream of events leading up to the current state. After that it receives events for changes that happen in the cluster.
 6. Now we have seen how to subscribe to cluster membership events. You can read more about it in the [documentation](https://doc.akka.io/docs/akka/2.6/typed/cluster.html#cluster-subscriptions). The membership events show us the state of the cluster but it does not help with accessing actors on other nodes the cluster. To do that we need to use the [Receptionist](https://doc.akka.io/docs/akka/2.6/typed/actor-discovery.html#receptionist).
 
-### 2. Worker registration example
+### 2. Worker registration example (using the `Receptionist`)
 
 The `Receptionist` is a service registry that will work both when in single JVM apps not using cluster, and in clustered apps.
 `ActorRef`s are registered to the receptionist using a `ServiceKey`. The service key is defined with a type of message that actors registered for it will accept and a string identifier.
@@ -70,8 +70,8 @@ Let's take a look at an example that illustrates how workers, here only on nodes
 
 To run this sample, make sure you have shut down any previously started cluster sample, then type `sbt "runMain sample.cluster.transformation.App"`.
 
-- TransformationApp starts 5 actor systems (cluster members) in the same JVM process. It can be more interesting to run them in separate processes.
-- Stop the application and run the following commands in separate terminal windows.
+- TransformationApp starts 5 actor systems (cluster members) in the same JVM process.
+- It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
 
     sbt "runMain sample.cluster.transformation.App backend 25251"
 
@@ -86,7 +86,7 @@ To run this sample, make sure you have shut down any previously started cluster 
 - There is a component built into Akka that performs the task of subscribing to the receptionist and keeping track of available actors significantly simplifying such interactions: the group router. Let's look into how we can use those in the next section!
 
 
-### 3. Cluster routing example
+### 3. Cluster routing example (cluster-aware routers)
 
 Let's take a look at two different ways to distribute work across a cluster using routers.
 
@@ -101,11 +101,15 @@ Let's take a look at a few samples that make use of cluster aware routers.
 
 #### Example with Group of routees
 
-The example application provides a service to calculate statistics for a text. When some text is sent to the service it splits it into words, and delegates the task to count number of characters in each word to a separate worker, a routee of a router. The character count for each word is sent back to an aggregator that calculates the average number of characters per word when all results have been collected.
+The example application provides a service to calculate statistics for a text.
 
-The worker that counts number of characters in each word is defined in [StatsWorker.scala](src/main/scala/sample/cluster/stats/StatsWorker.scala).
-
-The service that receives text from users and splits it up into words, delegates to a pool of workers and aggregates the result is defined in [StatsService.scala](src/main/scala/sample/cluster/stats/StatsService.scala).
+- When some text is sent to the service it splits it into words,
+and delegates the task to count number of characters in each word to a separate worker, a routee of a router.
+- The character count for each word is sent back to an aggregator that calculates the average number of characters per word when all results have been collected.
+- The worker that counts number of characters in each word is defined in
+  [StatsWorker.scala](src/main/scala/sample/cluster/stats/StatsWorker.scala).
+- The service that receives text from users and splits it up into words, delegates to a pool of workers and aggregates the result
+  is defined in [StatsService.scala](src/main/scala/sample/cluster/stats/StatsService.scala).
 
 Note, nothing cluster specific so far, just plain actors.
 
@@ -136,18 +140,23 @@ StatsSample starts 4 actor systems (cluster members) in the same JVM process. It
 #### Router example with Cluster Singleton
 
 [StatsSampleOneMaster.scala](src/main/scala/sample/cluster/stats/AppOneMaster.scala) each `compute` node starts
-N workers, that register themselves with the receptionist. The `StatsService` is run in a single instance in the cluster
-through the Akka Cluster Singleton. The actual work is performed by workers on all compute nodes though. The workers
+N workers, that register themselves with the receptionist. The **`StatsService`** is run in a **single instance** in the cluster
+through the **[Akka Cluster Singleton](https://doc.akka.io/docs/akka/current/typed/cluster-singleton.html)**.
+The actual work is performed by workers on all compute nodes though. The workers
 are reached through a group router used by the singleton.
 
-With this design it would be possible to query the singleton for current work - it knows all current requests in flight
+- With this design it would be possible to query the singleton for current work - it knows all current requests in flight
 and could potentially make decisions based on knowing exactly what work is currently in progress.
+- If the singleton node crashes however, all ongoing work is lost though since the state of the singleton is **not persistent**,
+ when it is started on a new node the `StatsService` will not know of any previous work.
+ It also means that since all work has to go through the singleton it could be come a **bottleneck**.
+-  If one of the other nodes crash only the ongoing work sent to them is lost, however since each ongoing request
+ could be handled by multiple different workers on different nodes a crash could cause problems to many requests.
 
-If the singleton node crashes however, all ongoing work is lost though since the state of the singleton is not persistent, when it is started on a new node the `StatsService` will not know of any previous work. It also means that since all work has to go through the singleton it could be come a bottleneck. If one of the other nodes crash only the ongoing work sent to them is lost, however since each ongoing request could be handled by multiple different workers on different nodes a crash could cause problems to many requests.
+To run this sample, type **`sbt "runMain sample.cluster.stats.AppOneMaster"`** if it is not already started.
 
-To run this sample, type `sbt "runMain sample.cluster.stats.AppOneMaster"` if it is not already started.
-
-StatsSampleOneMaster starts 4 actor systems (cluster members) in the same JVM process. It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
+- StatsSampleOneMaster starts 4 actor systems (cluster members) in the same JVM process.
+- It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
 
     sbt "runMain sample.cluster.stats.AppOneMaster compute 25251"
 
