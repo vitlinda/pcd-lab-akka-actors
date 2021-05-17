@@ -24,20 +24,21 @@ This tutorial contains 3 samples illustrating different [Akka cluster](https://d
     - The seed nodes are configured contact points which newly started nodes will try to connect with in order to join the cluster.
     - Note that if you are going to start the nodes on different machines you need to specify the ip-addresses or host names of the machines in `application.conf` instead of `127.0.0.1`.
 2. Open [SimpleClusterApp.scala](src/main/scala/sample/cluster/simple/App.scala).
-    - The small program together with its configuration starts an ActorSystem with the Cluster enabled. It joins the cluster and starts an actor that logs some membership events. Take a look at the [SimpleClusterListener.scala](src/main/scala/sample/cluster/simple/ClusterListener.scala) actor.
+    - The small program together with its configuration starts an ActorSystem with the Cluster enabled. It joins the cluster and starts an actor that logs some membership events.
+    Take a look at the [SimpleClusterListener.scala](src/main/scala/sample/cluster/simple/ClusterListener.scala) actor.
     - You can read more about the cluster concepts in the [documentation](https://doc.akka.io/docs/akka/2.6/typed/cluster.html).
-3. To run this sample, type **`sbt "runMain sample.cluster.simple.App"`**.
-    - `sample.cluster.simple.App` starts three actor systems (cluster members) in the same JVM process.
+3. To run this sample, type **`sbt "runMain it.unibo.pcd.akka.distributed.cluster.simple.App"`**.
+    - `it.unibo.pcd.akka.distributed.cluster.simple.App` starts three actor systems (cluster members) in the same JVM process.
 4. It can be more interesting to run them in separate processes. Stop the application and then open three terminal windows.
    In the first terminal window, start the first seed node with the following command:
-    1. **`sbt "runMain sample.cluster.simple.App 25251"`** where 25251 corresponds to the port of the first seed-nodes element in the configuration.
+    1. **`sbt "runMain it.unibo.pcd.akka.distributed.cluster.simple.App 25251"`** where 25251 corresponds to the port of the first seed-nodes element in the configuration.
     In the log output you see that the cluster node has been started and changed status to 'Up'.
     2. In the second terminal window, start the second seed node with the following command:
-    **`sbt "runMain sample.cluster.simple.App 25252"`** where 25252 corresponds to the port of the second seed-nodes element in the configuration.
+    **`sbt "runMain it.unibo.pcd.akka.distributed.cluster.simple.App 25252"`** where 25252 corresponds to the port of the second seed-nodes element in the configuration.
     In the log output you see that the cluster node has been started and joins the other seed node and becomes a member of the cluster. Its status changed to 'Up'.
     3. Switch over to the first terminal window and see in the log output that the member joined.
     4. Start another node in the third terminal window with the following command:
-    **`sbt "runMain sample.cluster.simple.App 0"`**
+    **`sbt "runMain it.unibo.pcd.akka.distributed.cluster.simple.App 0"`**
     Now you don't need to specify the port number, 0 means that it will use a random available port. It joins one of the configured seed nodes. Look at the log output in the different terminal windows.
     5. Start even more nodes in the same way, if you like.
     6. Shut down one of the nodes by pressing 'ctrl-c' in one of the terminal windows. It will cause the node to do a graceful leave from the cluster, telling the other nodes in the cluster that it is leaving.
@@ -68,20 +69,21 @@ Let's take a look at an example that illustrates how workers, here only on nodes
  If a worker dies or its node is removed from the cluster the receptionist will send out an updated listing
  so the frontend does not need to `watch` the workers.
 
-To run this sample, make sure you have shut down any previously started cluster sample, then type `sbt "runMain sample.cluster.transformation.App"`.
+To run this sample, make sure you have shut down any previously started cluster sample,
+then type `sbt "runMain it.unibo.pcd.akka.distributed.cluster.transformation.App"`.
 
 - TransformationApp starts 5 actor systems (cluster members) in the same JVM process.
 - It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
 
-    sbt "runMain sample.cluster.transformation.App backend 25251"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.transformation.App backend 25251"
 
-    sbt "runMain sample.cluster.transformation.App backend 25252"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.transformation.App backend 25252"
 
-    sbt "runMain sample.cluster.transformation.App backend 0"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.transformation.App backend 0"
 
-    sbt "runMain sample.cluster.transformation.App frontend 0"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.transformation.App frontend 0"
 
-    sbt "runMain sample.cluster.transformation.App frontend 0"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.transformation.App frontend 0"
 
 - There is a component built into Akka that performs the task of subscribing to the receptionist and keeping track of available actors significantly simplifying such interactions: the group router. Let's look into how we can use those in the next section!
 
@@ -120,18 +122,18 @@ when started.
 - With this design a single `compute` node crashing will only lose the ongoing work in that node and have the other nodes
 keep on with their work, but there is no single place to ask for a list of the current work in progress.
 
-To run the sample, type `sbt "runMain sample.cluster.stats.App"` if it is not already started.
+To run the sample, type `sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.App"` if it is not already started.
 
 - StatsSample starts 4 actor systems (cluster members) in the same JVM process.
 - It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
 
     sbt "runMain sample.cluster.stats.App compute 25251"
 
-    sbt "runMain sample.cluster.stats.App compute 25252"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.App compute 25252"
 
-    sbt "runMain sample.cluster.stats.App compute  0"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.App compute  0"
 
-    sbt "runMain sample.cluster.stats.App client 0"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.App client 0"
 
 
 #### Router example with Cluster Singleton
@@ -150,15 +152,15 @@ and could potentially make decisions based on knowing exactly what work is curre
 -  If one of the other nodes crash only the ongoing work sent to them is lost, however since each ongoing request
  could be handled by multiple different workers on different nodes a crash could cause problems to many requests.
 
-To run this sample, type **`sbt "runMain sample.cluster.stats.AppOneMaster"`** if it is not already started.
+To run this sample, type **`sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.AppOneMaster"`** if it is not already started.
 
 - `AppOneMaster` starts 4 actor systems (cluster members) in the same JVM process.
 - It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
 
-    sbt "runMain sample.cluster.stats.AppOneMaster compute 25251"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.AppOneMaster compute 25251"
 
-    sbt "runMain sample.cluster.stats.AppOneMaster compute 25252"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.AppOneMaster compute 25252"
 
-    sbt "runMain sample.cluster.stats.AppOneMaster compute 0"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.AppOneMaster compute 0"
 
-    sbt "runMain sample.cluster.stats.AppOneMaster client 0"
+    sbt "runMain it.unibo.pcd.akka.distributed.cluster.stats.AppOneMaster client 0"
