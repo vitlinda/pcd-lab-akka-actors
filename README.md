@@ -106,27 +106,24 @@ The example application provides a service to calculate statistics for a text.
 - When some text is sent to the service it splits it into words,
 and delegates the task to count number of characters in each word to a separate worker, a routee of a router.
 - The character count for each word is sent back to an aggregator that calculates the average number of characters per word when all results have been collected.
-- The worker that counts number of characters in each word is defined in
-  [StatsWorker.scala](src/main/scala/sample/cluster/stats/StatsWorker.scala).
-- The service that receives text from users and splits it up into words, delegates to a pool of workers and aggregates the result
-  is defined in [StatsService.scala](src/main/scala/sample/cluster/stats/StatsService.scala).
-
-Note, nothing cluster specific so far, just plain actors.
-
-Nodes in the cluster can be marked with roles, to perform different tasks, in our case we use `compute` as a role to
+- The **worker** that counts number of characters in each word
+  is defined in **[StatsWorker.scala](src/main/scala/sample/cluster/stats/StatsWorker.scala)**.
+- The **service** that receives text from users and splits it up into words, delegates to a pool of workers and aggregates the result
+  is defined in **[StatsService.scala](src/main/scala/sample/cluster/stats/StatsService.scala)**.
+- Note, nothing cluster specific so far, just plain actors.
+- Nodes in the cluster can be marked with roles, to perform different tasks, in our case we use **`compute`** as a role to
 designate cluster nodes that should do processing of word statistics.
-
-In [StatsSample.scala](src/main/scala/sample/cluster/stats/App.scala) each `compute` node starts a `StatsService`
+- In **[StatsSample.scala](src/main/scala/sample/cluster/stats/App.scala)** each `compute` node starts a `StatsService`
 that distributes work over N local `StatsWorkers`. The client nodes then message the `StatsService` instances through a `group` router.
 The router finds services by subscribing to the cluster receptionist and a service key. Each worker is registered to the receptionist
 when started.
-
-With this design a single `compute` node crashing will only lose the ongoing work in that node and have the other nodes
+- With this design a single `compute` node crashing will only lose the ongoing work in that node and have the other nodes
 keep on with their work, but there is no single place to ask for a list of the current work in progress.
 
 To run the sample, type `sbt "runMain sample.cluster.stats.App"` if it is not already started.
 
-StatsSample starts 4 actor systems (cluster members) in the same JVM process. It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
+- StatsSample starts 4 actor systems (cluster members) in the same JVM process.
+- It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
 
     sbt "runMain sample.cluster.stats.App compute 25251"
 
