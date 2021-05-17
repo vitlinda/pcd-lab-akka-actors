@@ -21,7 +21,7 @@ object StatsWorker {
 
   def apply(): Behavior[Command] = Behaviors.setup { ctx =>
     Behaviors.withTimers { timers =>
-      ctx.log.info("Worker starting up")
+      ctx.log.info(s"Worker ${ctx.self.path.toStringWithAddress(ctx.system.address)} starting up")
       timers.startTimerWithFixedDelay(EvictCache, EvictCache, 30.seconds)
 
       withCache(ctx, Map.empty)
@@ -32,7 +32,7 @@ object StatsWorker {
                         cache: Map[String, Int]): Behavior[Command] =
     Behaviors.receiveMessage {
       case Process(word, replyTo) =>
-        ctx.log.info("Worker processing request [{}]", word)
+        ctx.log.info(s"Worker ${ctx.self.path.toStringWithAddress(ctx.system.address)} processing request [{}]", word)
         cache.get(word) match {
           case Some(length) =>
             replyTo ! Processed(word, length)
