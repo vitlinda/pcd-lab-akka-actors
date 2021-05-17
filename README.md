@@ -136,7 +136,7 @@ To run the sample, type `sbt "runMain sample.cluster.stats.App"` if it is not al
 
 #### Router example with Cluster Singleton
 
-[StatsSampleOneMaster.scala](src/main/scala/sample/cluster/stats/AppOneMaster.scala) each `compute` node starts
+In **[AppOneMaster.scala](src/main/scala/sample/cluster/stats/AppOneMaster.scala)**, each `compute` node starts
 N workers, that register themselves with the receptionist. The **`StatsService`** is run in a **single instance** in the cluster
 through the **[Akka Cluster Singleton](https://doc.akka.io/docs/akka/current/typed/cluster-singleton.html)**.
 The actual work is performed by workers on all compute nodes though. The workers
@@ -152,7 +152,7 @@ and could potentially make decisions based on knowing exactly what work is curre
 
 To run this sample, type **`sbt "runMain sample.cluster.stats.AppOneMaster"`** if it is not already started.
 
-- StatsSampleOneMaster starts 4 actor systems (cluster members) in the same JVM process.
+- `AppOneMaster` starts 4 actor systems (cluster members) in the same JVM process.
 - It can be more interesting to run them in separate processes. Stop the application and run the following commands in separate terminal windows.
 
     sbt "runMain sample.cluster.stats.AppOneMaster compute 25251"
