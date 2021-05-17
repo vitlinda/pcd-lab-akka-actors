@@ -8,6 +8,7 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 
 import scala.concurrent.duration._
+import scala.util.Random
 
 object StatsClient {
 
@@ -23,8 +24,10 @@ object StatsClient {
 
         Behaviors.receiveMessage {
           case Tick =>
-            ctx.log.info("Sending process request")
-            service ! StatsService.ProcessText("this is the text that will be analyzed", responseAdapter)
+            val text = Random.shuffle("this is the text that will be analyzed".split(" ").toList).take(1 + Random.nextInt(10)).mkString(" ")
+            val req = StatsService.ProcessText(text, responseAdapter)
+            ctx.log.info(s"Sending process request ${req}")
+            service ! req
             Behaviors.same
           case ServiceResponse(result) =>
             ctx.log.info("Service result: {}", result)
