@@ -113,7 +113,7 @@ and delegates the task to count number of characters in each word to a separate 
 - Note, nothing cluster specific so far, just plain actors.
 - Nodes in the cluster can be marked with roles, to perform different tasks, in our case we use **`compute`** as a role to
 designate cluster nodes that should do processing of word statistics.
-- In **[StatsSample.scala](src/main/scala/sample/cluster/stats/App.scala)** each `compute` node starts a `StatsService`
+- In **[stats/App.scala](src/main/scala/sample/cluster/stats/App.scala)** each `compute` node starts a `StatsService`
 that distributes work over N local `StatsWorkers`. The client nodes then message the `StatsService` instances through a `group` router.
 The router finds services by subscribing to the cluster receptionist and a service key. Each worker is registered to the receptionist
 when started.
