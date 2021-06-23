@@ -11,6 +11,7 @@ import scala.util.Success
 
 object HelloBehavior {
   final case class Greet(whom: String, replyTo: ActorRef[Greeted])
+
   final case class Greeted(whom: String, from: ActorRef[Greet])
 
   def apply(): Behavior[Greet] = Behaviors.receive { (context, message) =>
@@ -21,16 +22,17 @@ object HelloBehavior {
 }
 
 object InteractionPatternsAsk extends App {
+
   import HelloBehavior._
 
-  val system = ActorSystem[Greeted](Behaviors.setup{ ctx =>
+  val system = ActorSystem[Greeted](Behaviors.setup { ctx =>
     val greeter = ctx.spawnAnonymous(HelloBehavior())
     implicit val timeout: Timeout = 2.seconds
     implicit val scheduler = ctx.system.scheduler
     val f: Future[Greeted] = greeter ? (replyTo => Greet("Bob", replyTo))
     implicit val ec = ctx.executionContext
     f.onComplete {
-      case Success(Greeted(who,from)) => println(s"${who} has been greeted by ${from.path}!")
+      case Success(Greeted(who, from)) => println(s"${who} has been greeted by ${from.path}!")
       case _ => println("No greet")
     }
     Behaviors.empty
@@ -38,14 +40,21 @@ object InteractionPatternsAsk extends App {
 }
 
 object InteractionPatternsPipeToSelf extends App {
+
   import HelloBehavior._
 
-  val system = ActorSystem[Greeted](Behaviors.setup{ ctx =>
+  val system = ActorSystem[Greeted](Behaviors.setup { ctx =>
     val greeter = ctx.spawn(HelloBehavior(), "greeter")
     implicit val timeout: Timeout = 2.seconds
     implicit val scheduler = ctx.system.scheduler
     val f: Future[Greeted] = greeter ? (replyTo => Greet("Bob", replyTo))
-    ctx.pipeToSelf(f)(_.getOrElse(Greeted("nobody", ctx.system.ignoreRef)))
+    //    ctx.pipeToSelf(f)(_.getOrElse(Greeted("nobody", ctx.system.ignoreRef)))
+    //oppure:
+    ctx.pipeToSelf(f) {
+      case Success(g) => g
+      case _ => Greeted("nobody", ctx.system.ignoreRef)
+    }
+
     Behaviors.receive {
       case (ctx, Greeted(whom, from)) =>
         ctx.log.info(s"${whom} has been greeted by ${from.path.name}")
@@ -60,7 +69,7 @@ object InteractionPatternsSelfMessage extends App {
       Behaviors.receiveMessage {
         case "" => Behaviors.stopped
         case s =>
-          ctx.log.info(""+s.head)
+          ctx.log.info("" + s.head)
           timers.startSingleTimer(s.tail, 300.millis)
           Behaviors.same
       }
@@ -72,7 +81,7 @@ object InteractionPatternsSelfMessage extends App {
 
 object InteractionPatternsMsgAdapter extends App {
   val system = ActorSystem[String](Behaviors.setup { ctx =>
-    val adaptedRef: ActorRef[Int] = ctx.messageAdapter[Int](i => if(i==0) "" else i.toString)
+    val adaptedRef: ActorRef[Int] = ctx.messageAdapter[Int](i => if (i == 0) "" else i.toString)
     adaptedRef ! 130
     adaptedRef ! 0
     Behaviors.receiveMessage {
